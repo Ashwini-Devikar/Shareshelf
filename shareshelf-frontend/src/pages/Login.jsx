@@ -1,9 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from || "/my-shelf";
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -14,8 +19,9 @@ export default function Login() {
       return;
     }
     setError("");
-    // Week 3: POST /api/auth/login, store JWT, redirect
-    alert("Login API will be connected in Week 3.");
+    // Week 3: POST /api/auth/login, store the JWT. For now any credentials work.
+    login(form.email);
+    navigate(redirectTo, { replace: true });
   };
 
   return (

@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const [form, setForm] = useState({ name: "", email: "", city: "", password: "", confirm: "" });
   const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -22,8 +25,9 @@ export default function Register() {
       return;
     }
     setError("");
-    // Week 3: POST /api/auth/register
-    alert("Register API will be connected in Week 3.");
+    // Week 3: POST /api/auth/register. For now we just log the user in.
+    login(form.email, form.name);
+    navigate("/my-shelf");
   };
 
   return (

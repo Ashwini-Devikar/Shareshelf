@@ -1,6 +1,15 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
     <nav className="navbar navbar-expand-lg bg-white border-bottom sticky-top">
       <div className="container">
@@ -28,11 +37,33 @@ export default function Navbar() {
             <li className="nav-item">
               <NavLink className="nav-link" to="/browse">Browse Books</NavLink>
             </li>
+            {user && (
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/my-shelf">My Shelf</NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/my-requests">My Requests</NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/received-requests">Received</NavLink>
+                </li>
+              </>
+            )}
           </ul>
 
-          <div className="d-flex gap-2">
-            <Link to="/login" className="btn btn-outline-brand">Login</Link>
-            <Link to="/register" className="btn btn-brand">Sign Up</Link>
+          <div className="d-flex gap-2 align-items-center">
+            {user ? (
+              <>
+                <span className="text-muted small">Hi, {user.name}</span>
+                <button className="btn btn-outline-brand" onClick={handleLogout}>Logout</button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="btn btn-outline-brand">Login</Link>
+                <Link to="/register" className="btn btn-brand">Sign Up</Link>
+              </>
+            )}
           </div>
         </div>
       </div>
