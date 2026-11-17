@@ -1,0 +1,71 @@
+:root {
+  --ss-brand: #5b3df5;
+  --ss-brand-dark: #4429c9;
+  --ss-soft: #f4f2ff;
+}
+
+body {
+  background: #fafafc;
+  color: #1f2430;
+}
+
+.navbar-brand span {
+  color: var(--ss-brand);
+}
+
+.btn-brand {
+  background: var(--ss-brand);
+  border-color: var(--ss-brand);
+  color: #fff;
+}
+.btn-brand:hover {
+  background: var(--ss-brand-dark);
+  border-color: var(--ss-brand-dark);
+  color: #fff;
+}
+.btn-outline-brand {
+  color: var(--ss-brand);
+  border-color: var(--ss-brand);
+}
+.btn-outline-brand:hover {
+  background: var(--ss-brand);
+  color: #fff;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--ss-soft), #ffffff);
+  border-radius: 1.25rem;
+}
+
+.book-card {
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(31, 36, 48, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(31, 36, 48, 0.14);
+}
+.book-cover {
+  height: 200px;
+  border-radius: 1rem 1rem 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #fff;
+}
+
+.step-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--ss-soft);
+  color: var(--ss-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 0.75rem;
+}
