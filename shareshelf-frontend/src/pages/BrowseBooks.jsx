@@ -1,21 +1,48 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import BookCard from "../components/BookCard";
 import SearchBar from "../components/SearchBar";
-import { mockBooks } from "../data/mockBooks";
+import { Loading, ErrorMsg } from "../components/Status";
+import { api } from "../api/client";
 
 export default function BrowseBooks() {
   const [query, setQuery] = useState("");
   const [genre, setGenre] = useState("");
   const [onlyAvailable, setOnlyAvailable] = useState(false);
 
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return mockBooks.filter((b) => {
-      const matchesText = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
-      const matchesGenre = !genre || b.genre === genre;
-      const matchesStatus = !onlyAvailable || b.status === "AVAILABLE";
-      return matchesText && matchesGenre && matchesStatus;
-    });
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    // Wait 300 ms after the last keystroke before calling the API
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (query.trim()) params.set("q", query.trim());
+      if (genre) params.set("genre", genre);
+      if (onlyAvailable) params.set("available", "true");
+
+      api(`/api/books?${params.toString()}`, { auth: false })
+        .then((data) => {
+          if (!cancelled) {
+            setBooks(data);
+            setError("");
+          }
+        })
+        .catch((err) => {
+          if (!cancelled) setError(err.message);
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [query, genre, onlyAvailable]);
 
   return (
@@ -31,18 +58,25 @@ export default function BrowseBooks() {
         setOnlyAvailable={setOnlyAvailable}
       />
 
-      <p className="text-muted small">{results.length} book(s) found</p>
+      <ErrorMsg message={error} />
 
-      {results.length === 0 ? (
-        <div className="text-center text-muted py-5">No books match your search.</div>
+      {loading ? (
+        <Loading />
       ) : (
-        <div className="row g-4">
-          {results.map((b) => (
-            <div className="col-12 col-sm-6 col-lg-3" key={b.id}>
-              <BookCard book={b} />
+        <>
+          <p className="text-muted small">{books.length} book(s) found</p>
+          {books.length === 0 ? (
+            <div className="text-center text-muted py-5">No books match your search.</div>
+          ) : (
+            <div className="row g-4">
+              {books.map((b) => (
+                <div className="col-12 col-sm-6 col-lg-3" key={b.id}>
+                  <BookCard book={b} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

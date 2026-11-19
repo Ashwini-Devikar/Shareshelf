@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BookCard from "../components/BookCard";
-import { myBooks } from "../data/mockUser";
+import { Loading, ErrorMsg } from "../components/Status";
+import { api } from "../api/client";
 
 export default function MyShelf() {
-  const [books, setBooks] = useState(myBooks);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleDelete = (id) => {
-    if (window.confirm("Remove this book from your shelf?")) {
-      // Week 3: DELETE /api/books/{id}
-      setBooks(books.filter((b) => b.id !== id));
+  useEffect(() => {
+    api("/api/books/my")
+      .then(setBooks)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Remove this book from your shelf?")) return;
+    setError("");
+    try {
+      await api(`/api/books/${id}`, { method: "DELETE" });
+      setBooks((prev) => prev.filter((b) => b.id !== id));
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -20,7 +34,11 @@ export default function MyShelf() {
         <Link to="/add-book" className="btn btn-brand">+ Add Book</Link>
       </div>
 
-      {books.length === 0 ? (
+      <ErrorMsg message={error} />
+
+      {loading ? (
+        <Loading />
+      ) : books.length === 0 ? (
         <div className="text-center text-muted py-5">
           Your shelf is empty. <Link to="/add-book">Add your first book</Link>.
         </div>

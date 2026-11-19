@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { ErrorMsg } from "../components/Status";
 
 export default function Register() {
   const [form, setForm] = useState({ name: "", email: "", city: "", password: "", confirm: "" });
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.password) {
       setError("Name, email and password are required.");
@@ -25,9 +27,15 @@ export default function Register() {
       return;
     }
     setError("");
-    // Week 3: POST /api/auth/register. For now we just log the user in.
-    login(form.email, form.name);
-    navigate("/my-shelf");
+    setLoading(true);
+    try {
+      await register({ name: form.name, email: form.email, password: form.password, city: form.city });
+      navigate("/my-shelf");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,7 +45,7 @@ export default function Register() {
           <div className="card-body p-4">
             <h3 className="fw-bold text-center mb-4">Create your account</h3>
 
-            {error && <div className="alert alert-danger py-2">{error}</div>}
+            <ErrorMsg message={error} />
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
@@ -62,7 +70,9 @@ export default function Register() {
                   <input type="password" name="confirm" className="form-control" value={form.confirm} onChange={handleChange} />
                 </div>
               </div>
-              <button className="btn btn-brand w-100" type="submit">Sign Up</button>
+              <button className="btn btn-brand w-100" type="submit" disabled={loading}>
+                {loading ? "Creating account..." : "Sign Up"}
+              </button>
             </form>
 
             <p className="text-center text-muted small mt-3 mb-0">

@@ -1,45 +1,70 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import StatusBadge from "../components/StatusBadge";
+import { Loading, ErrorMsg } from "../components/Status";
 import { useAuth } from "../context/AuthContext";
-import { mockBooks } from "../data/mockBooks";
-import { myBooks } from "../data/mockUser";
+import { api } from "../api/client";
+import { bookColor } from "../utils/bookColor";
 
 export default function BookDetails() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [book, setBook] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
   const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [sendError, setSendError] = useState("");
 
-  const book = [...mockBooks, ...myBooks].find((b) => b.id === Number(id));
+  useEffect(() => {
+    setLoading(true);
+    api(`/api/books/${id}`, { auth: false })
+      .then(setBook)
+      .catch((err) => setLoadError(err.message))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  if (!book) {
+  if (loading) return <Loading />;
+
+  if (loadError || !book) {
     return (
       <div className="text-center my-5">
-        <p>Book not found.</p>
+        <p>{loadError || "Book not found."}</p>
         <Link to="/browse">Back to Browse</Link>
       </div>
     );
   }
 
-  const isMine = book.owner === "You";
+  const isMine = user && book.ownerId === user.id;
   const canRequest = book.status === "AVAILABLE" && !isMine;
 
-  const handleRequest = (e) => {
+  const handleRequest = async (e) => {
     e.preventDefault();
     if (!user) {
       navigate("/login", { state: { from: `/books/${book.id}` } });
       return;
     }
-    // Week 3: POST /api/requests { bookId, message }
-    setSent(true);
+    setSending(true);
+    setSendError("");
+    try {
+      await api("/api/requests", { method: "POST", body: { bookId: book.id, message } });
+      setSent(true);
+      setBook({ ...book, status: "REQUESTED" });
+    } catch (err) {
+      setSendError(err.message);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
     <div className="row g-4 my-4">
       <div className="col-md-4">
-        <div className="book-cover rounded-4" style={{ background: book.color, height: 320 }}>
+        <div className="book-cover rounded-4" style={{ background: bookColor(book.id), height: 320 }}>
           📖
         </div>
       </div>
@@ -50,19 +75,22 @@ export default function BookDetails() {
         <p className="text-muted">by {book.author}</p>
 
         <div className="d-flex gap-2 mb-3">
-          <span className="badge text-bg-light border">{book.genre}</span>
+          <span className="badge text-bg-light border">{book.genre || "General"}</span>
           <StatusBadge status={book.status} />
         </div>
 
+        {book.description && <p>{book.description}</p>}
+
         <ul className="list-unstyled text-muted">
           <li>Condition: <strong>{book.condition}</strong></li>
-          <li>Owner: <strong>{book.owner}</strong> ({book.city})</li>
+          <li>Owner: <strong>{book.owner}</strong>{book.city ? ` (${book.city})` : ""}</li>
         </ul>
 
         {isMine && <div className="alert alert-info">This book is on your shelf.</div>}
 
         {canRequest && !sent && (
           <form onSubmit={handleRequest} className="mt-3" style={{ maxWidth: 480 }}>
+            <ErrorMsg message={sendError} />
             <label className="form-label">Message to the owner (optional)</label>
             <textarea
               className="form-control mb-3"
@@ -71,7 +99,9 @@ export default function BookDetails() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <button className="btn btn-brand" type="submit">Request to Borrow</button>
+            <button className="btn btn-brand" type="submit" disabled={sending}>
+              {sending ? "Sending..." : user ? "Request to Borrow" : "Login to Request"}
+            </button>
           </form>
         )}
 
@@ -81,7 +111,7 @@ export default function BookDetails() {
           </div>
         )}
 
-        {!canRequest && !isMine && (
+        {!canRequest && !isMine && !sent && (
           <div className="alert alert-secondary mt-3">This book is not available right now.</div>
         )}
       </div>

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { ErrorMsg } from "../components/Status";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -12,16 +14,22 @@ export default function Login() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.email || !form.password) {
       setError("Please enter your email and password.");
       return;
     }
     setError("");
-    // Week 3: POST /api/auth/login, store the JWT. For now any credentials work.
-    login(form.email);
-    navigate(redirectTo, { replace: true });
+    setLoading(true);
+    try {
+      await login(form.email, form.password);
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,7 +39,7 @@ export default function Login() {
           <div className="card-body p-4">
             <h3 className="fw-bold text-center mb-4">Welcome back</h3>
 
-            {error && <div className="alert alert-danger py-2">{error}</div>}
+            <ErrorMsg message={error} />
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
@@ -42,7 +50,9 @@ export default function Login() {
                 <label className="form-label">Password</label>
                 <input type="password" name="password" className="form-control" value={form.password} onChange={handleChange} />
               </div>
-              <button className="btn btn-brand w-100" type="submit">Login</button>
+              <button className="btn btn-brand w-100" type="submit" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+              </button>
             </form>
 
             <p className="text-center text-muted small mt-3 mb-0">

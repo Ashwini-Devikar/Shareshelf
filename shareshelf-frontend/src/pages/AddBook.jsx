@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { genres } from "../data/mockBooks";
+import { genres } from "../data/genres";
+import { ErrorMsg } from "../components/Status";
+import { api } from "../api/client";
 
 const conditions = ["NEW", "GOOD", "FAIR", "WORN"];
 
@@ -14,19 +16,26 @@ export default function AddBook() {
     description: "",
   });
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim() || !form.author.trim()) {
       setError("Title and author are required.");
       return;
     }
     setError("");
-    // Week 3: POST /api/books
-    alert(`"${form.title}" added (mock). Backend comes in Week 3.`);
-    navigate("/my-shelf");
+    setSaving(true);
+    try {
+      await api("/api/books", { method: "POST", body: form });
+      navigate("/my-shelf");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -36,7 +45,7 @@ export default function AddBook() {
           <div className="card-body p-4">
             <h3 className="fw-bold mb-4">Add a book to your shelf</h3>
 
-            {error && <div className="alert alert-danger py-2">{error}</div>}
+            <ErrorMsg message={error} />
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
@@ -65,7 +74,9 @@ export default function AddBook() {
                 <label className="form-label">Description</label>
                 <textarea name="description" rows={3} className="form-control" value={form.description} onChange={handleChange} />
               </div>
-              <button className="btn btn-brand" type="submit">Add Book</button>
+              <button className="btn btn-brand" type="submit" disabled={saving}>
+                {saving ? "Saving..." : "Add Book"}
+              </button>
             </form>
           </div>
         </div>

@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BookCard from "../components/BookCard";
-import { mockBooks } from "../data/mockBooks";
+import { Loading, ErrorMsg } from "../components/Status";
+import { api } from "../api/client";
 
 const steps = [
   { icon: "📚", title: "List your books", text: "Add the books you've finished to your virtual shelf." },
@@ -9,7 +11,16 @@ const steps = [
 ];
 
 export default function Home() {
-  const featured = mockBooks.filter((b) => b.status === "AVAILABLE").slice(0, 4);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    api("/api/books?available=true", { auth: false })
+      .then((data) => setBooks(data.slice(0, 4)))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <>
@@ -42,13 +53,21 @@ export default function Home() {
           <h3 className="fw-bold mb-0">Recently shared</h3>
           <Link to="/browse">View all →</Link>
         </div>
-        <div className="row g-4">
-          {featured.map((b) => (
-            <div className="col-12 col-sm-6 col-lg-3" key={b.id}>
-              <BookCard book={b} />
-            </div>
-          ))}
-        </div>
+
+        <ErrorMsg message={error} />
+        {loading ? (
+          <Loading />
+        ) : books.length === 0 && !error ? (
+          <p className="text-muted">No books yet. Be the first to <Link to="/register">share one</Link>!</p>
+        ) : (
+          <div className="row g-4">
+            {books.map((b) => (
+              <div className="col-12 col-sm-6 col-lg-3" key={b.id}>
+                <BookCard book={b} />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </>
   );

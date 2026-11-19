@@ -1,4 +1,4 @@
-import { genres } from "../data/mockBooks";
+import { genres } from "../data/genres";
 
 export default function SearchBar({ query, setQuery, genre, setGenre, onlyAvailable, setOnlyAvailable }) {
   return (
