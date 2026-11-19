@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ShareShelf</title>
+    <script>
+      // Apply the saved theme before the page paints, so there is no light/dark flash
+      (function () {
+        try {
+          var saved = localStorage.getItem("shareshelf_theme");
+          var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var theme = saved === "light" || saved === "dark" ? saved : dark ? "dark" : "light";
+          document.documentElement.setAttribute("data-bs-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

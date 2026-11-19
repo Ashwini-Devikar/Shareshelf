@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BookCard from "../components/BookCard";
-import { Loading, ErrorMsg } from "../components/Status";
+import { SkeletonGrid } from "../components/Skeleton";
+import { ErrorMsg } from "../components/Status";
+import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
 
 export default function MyShelf() {
+  const { toast, confirm } = useUI();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,14 +19,21 @@ export default function MyShelf() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Remove this book from your shelf?")) return;
-    setError("");
+  const handleDelete = async (book) => {
+    const ok = await confirm({
+      title: "Remove this book?",
+      message: `"${book.title}" will be removed from your shelf. This can't be undone.`,
+      confirmText: "Remove",
+      danger: true,
+    });
+    if (!ok) return;
+
     try {
-      await api(`/api/books/${id}`, { method: "DELETE" });
-      setBooks((prev) => prev.filter((b) => b.id !== id));
+      await api(`/api/books/${book.id}`, { method: "DELETE" });
+      setBooks((prev) => prev.filter((b) => b.id !== book.id));
+      toast("Book removed from your shelf");
     } catch (err) {
-      setError(err.message);
+      toast(err.message, "error");
     }
   };
 
@@ -37,21 +47,19 @@ export default function MyShelf() {
       <ErrorMsg message={error} />
 
       {loading ? (
-        <Loading />
+        <SkeletonGrid count={4} />
       ) : books.length === 0 ? (
         <div className="text-center text-muted py-5">
+          <div className="display-4">📚</div>
           Your shelf is empty. <Link to="/add-book">Add your first book</Link>.
         </div>
       ) : (
         <div className="row g-4">
-          {books.map((b) => (
+          {books.map((b, i) => (
             <div className="col-12 col-sm-6 col-lg-3" key={b.id}>
               <div className="d-flex flex-column h-100">
-                <BookCard book={b} />
-                <button
-                  className="btn btn-outline-danger btn-sm mt-2"
-                  onClick={() => handleDelete(b.id)}
-                >
+                <BookCard book={b} index={i} />
+                <button className="btn btn-outline-danger btn-sm mt-2" onClick={() => handleDelete(b)}>
                   Remove
                 </button>
               </div>

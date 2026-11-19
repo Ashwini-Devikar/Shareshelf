@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import StatusBadge from "../components/StatusBadge";
+import BookCover from "../components/BookCover";
+import WishlistButton from "../components/WishlistButton";
 import { Loading, ErrorMsg } from "../components/Status";
 import { useAuth } from "../context/AuthContext";
+import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
-import { bookColor } from "../utils/bookColor";
 
 export default function BookDetails() {
   const { id } = useParams();
   const { user } = useAuth();
+  const { toast } = useUI();
   const navigate = useNavigate();
 
   const [book, setBook] = useState(null);
@@ -54,8 +57,10 @@ export default function BookDetails() {
       await api("/api/requests", { method: "POST", body: { bookId: book.id, message } });
       setSent(true);
       setBook({ ...book, status: "REQUESTED" });
+      toast("Request sent to the owner!");
     } catch (err) {
       setSendError(err.message);
+      toast(err.message, "error");
     } finally {
       setSending(false);
     }
@@ -64,8 +69,13 @@ export default function BookDetails() {
   return (
     <div className="row g-4 my-4">
       <div className="col-md-4">
-        <div className="book-cover rounded-4" style={{ background: bookColor(book.id), height: 320 }}>
-          📖
+        <div className="position-relative">
+          <BookCover book={book} height={380} className="rounded-4 shadow" />
+          {!isMine && (
+            <div className="cover-actions">
+              <WishlistButton bookId={book.id} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -75,7 +85,7 @@ export default function BookDetails() {
         <p className="text-muted">by {book.author}</p>
 
         <div className="d-flex gap-2 mb-3">
-          <span className="badge text-bg-light border">{book.genre || "General"}</span>
+          <span className="badge bg-body-secondary text-body border">{book.genre || "General"}</span>
           <StatusBadge status={book.status} />
         </div>
 

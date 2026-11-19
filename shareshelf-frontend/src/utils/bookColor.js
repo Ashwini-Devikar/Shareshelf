@@ -5,6 +5,13 @@ export function bookColor(id) {
   return palette[Number(id) % palette.length];
 }
 
+// Two-colour gradient used when a book has no cover image
+export function bookGradient(id) {
+  const a = palette[Number(id) % palette.length];
+  const b = palette[(Number(id) + 3) % palette.length];
+  return `linear-gradient(135deg, ${a}, ${b})`;
+}
+
 export function shortDate(value) {
   return value ? String(value).slice(0, 10) : "—";
 }

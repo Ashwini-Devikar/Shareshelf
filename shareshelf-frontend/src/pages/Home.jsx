@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BookCard from "../components/BookCard";
-import { Loading, ErrorMsg } from "../components/Status";
+import { SkeletonGrid } from "../components/Skeleton";
+import { ErrorMsg } from "../components/Status";
 import { api } from "../api/client";
 
 const steps = [
@@ -25,13 +26,16 @@ export default function Home() {
   return (
     <>
       <section className="hero p-4 p-md-5 my-4 text-center">
-        <h1 className="display-5 fw-bold">Share books. Read more. Spend less.</h1>
+        <h1 className="display-4 fw-bold">
+          Share books. <span className="gradient-text">Read more.</span>
+        </h1>
         <p className="lead text-muted mx-auto" style={{ maxWidth: 600 }}>
-          ShareShelf connects readers who have books sitting idle with people who want to read them.
+          ShareShelf connects readers who have books sitting idle with people who want to read them. Free, local and
+          friendly.
         </p>
-        <div className="d-flex justify-content-center gap-2 mt-3">
-          <Link to="/browse" className="btn btn-brand btn-lg">Browse Books</Link>
-          <Link to="/register" className="btn btn-outline-brand btn-lg">Start Sharing</Link>
+        <div className="d-flex justify-content-center gap-2 mt-4 flex-wrap">
+          <Link to="/browse" className="btn btn-brand btn-lg px-4">Browse Books</Link>
+          <Link to="/register" className="btn btn-outline-brand btn-lg px-4">Start Sharing</Link>
         </div>
       </section>
 
@@ -56,14 +60,14 @@ export default function Home() {
 
         <ErrorMsg message={error} />
         {loading ? (
-          <Loading />
+          <SkeletonGrid count={4} />
         ) : books.length === 0 && !error ? (
           <p className="text-muted">No books yet. Be the first to <Link to="/register">share one</Link>!</p>
         ) : (
           <div className="row g-4">
-            {books.map((b) => (
+            {books.map((b, i) => (
               <div className="col-12 col-sm-6 col-lg-3" key={b.id}>
-                <BookCard book={b} />
+                <BookCard book={b} index={i} />
               </div>
             ))}
           </div>

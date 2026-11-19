@@ -1,21 +1,35 @@
 import { Link } from "react-router-dom";
 import StatusBadge from "./StatusBadge";
-import { bookColor } from "../utils/bookColor";
+import BookCover from "./BookCover";
+import WishlistButton from "./WishlistButton";
+import { useAuth } from "../context/AuthContext";
 
-export default function BookCard({ book }) {
+export default function BookCard({ book, index = 0 }) {
+  const { user } = useAuth();
+  const isMine = user && book.ownerId === user.id;
+
   return (
-    <div className="card book-card h-100">
-      <div className="book-cover" style={{ background: bookColor(book.id) }}>
-        📖
+    <div className="card book-card h-100 fade-up" style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}>
+      <div className="position-relative">
+        <Link to={`/books/${book.id}`} aria-label={`View ${book.title}`}>
+          <BookCover book={book} height={200} />
+        </Link>
+        <div className="cover-status">
+          <StatusBadge status={book.status} />
+        </div>
+        {!isMine && (
+          <div className="cover-actions">
+            <WishlistButton bookId={book.id} />
+          </div>
+        )}
       </div>
 
       <div className="card-body d-flex flex-column">
-        <div className="d-flex justify-content-between align-items-start mb-1">
-          <span className="badge text-bg-light border">{book.genre || "General"}</span>
-          <StatusBadge status={book.status} />
-        </div>
+        <span className="badge bg-body-secondary text-body border align-self-start mb-2">
+          {book.genre || "General"}
+        </span>
 
-        <h6 className="card-title fw-bold mt-2 mb-1">{book.title}</h6>
+        <h6 className="card-title fw-bold mb-1 line-clamp-2">{book.title}</h6>
         <p className="text-muted small mb-2">by {book.author}</p>
 
         <p className="small text-muted mb-3">

@@ -1,17 +1,22 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
+import { useUI } from "../context/UIContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { theme, toggle } = useTheme();
+  const { toast } = useUI();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+    toast("You have been logged out", "info");
     navigate("/");
   };
 
   return (
-    <nav className="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <nav className="navbar navbar-expand-lg navbar-glass border-bottom sticky-top">
       <div className="container">
         <Link className="navbar-brand fw-bold fs-4" to="/">
           📚 Share<span>Shelf</span>
@@ -38,24 +43,43 @@ export default function Navbar() {
               <NavLink className="nav-link" to="/browse">Browse Books</NavLink>
             </li>
             {user && (
-              <>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/my-shelf">My Shelf</NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/my-requests">My Requests</NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/received-requests">Received</NavLink>
-                </li>
-              </>
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  onClick={(e) => e.preventDefault()}
+                >
+                  My Space
+                </a>
+                <ul className="dropdown-menu">
+                  <li><NavLink className="dropdown-item" to="/dashboard">📊 Dashboard</NavLink></li>
+                  <li><NavLink className="dropdown-item" to="/my-shelf">📚 My Shelf</NavLink></li>
+                  <li><NavLink className="dropdown-item" to="/wishlist">♥ Wishlist</NavLink></li>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li><NavLink className="dropdown-item" to="/my-requests">📤 My Requests</NavLink></li>
+                  <li><NavLink className="dropdown-item" to="/received-requests">📥 Received Requests</NavLink></li>
+                </ul>
+              </li>
             )}
           </ul>
 
           <div className="d-flex gap-2 align-items-center">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggle}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={theme === "dark" ? "Light mode" : "Dark mode"}
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+
             {user ? (
               <>
-                <span className="text-muted small">Hi, {user.name}</span>
+                <span className="text-muted small d-none d-md-inline">Hi, {user.name}</span>
                 <button className="btn btn-outline-brand" onClick={handleLogout}>Logout</button>
               </>
             ) : (

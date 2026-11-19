@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useUI } from "../context/UIContext";
 import { ErrorMsg } from "../components/Status";
 
 export default function Register() {
@@ -8,6 +9,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
+  const { toast } = useUI();
   const navigate = useNavigate();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,6 +32,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register({ name: form.name, email: form.email, password: form.password, city: form.city });
+      toast("Account created. Welcome to ShareShelf!");
       navigate("/my-shelf");
     } catch (err) {
       setError(err.message);

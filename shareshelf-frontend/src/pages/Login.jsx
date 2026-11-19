@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useUI } from "../context/UIContext";
 import { ErrorMsg } from "../components/Status";
 
 export default function Login() {
@@ -8,6 +9,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { toast } = useUI();
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = location.state?.from || "/my-shelf";
@@ -24,6 +26,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form.email, form.password);
+      toast("Welcome back!");
       navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message);

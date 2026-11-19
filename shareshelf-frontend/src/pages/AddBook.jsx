@@ -2,18 +2,22 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { genres } from "../data/genres";
 import { ErrorMsg } from "../components/Status";
+import BookCover from "../components/BookCover";
+import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
 
 const conditions = ["NEW", "GOOD", "FAIR", "WORN"];
 
 export default function AddBook() {
   const navigate = useNavigate();
+  const { toast } = useUI();
   const [form, setForm] = useState({
     title: "",
     author: "",
     genre: genres[0],
     condition: "GOOD",
     description: "",
+    coverUrl: "",
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -29,18 +33,23 @@ export default function AddBook() {
     setError("");
     setSaving(true);
     try {
-      await api("/api/books", { method: "POST", body: form });
+      await api("/api/books", { method: "POST", body: { ...form, coverUrl: form.coverUrl.trim() || null } });
+      toast(`"${form.title.trim()}" added to your shelf`);
       navigate("/my-shelf");
     } catch (err) {
       setError(err.message);
+      toast(err.message, "error");
     } finally {
       setSaving(false);
     }
   };
 
+  // Live preview: same component the cards use, so it falls back to a colour if the link is broken
+  const preview = { id: 1, title: form.title || "Your book title", coverUrl: form.coverUrl.trim() };
+
   return (
-    <div className="row justify-content-center my-4">
-      <div className="col-12 col-md-8 col-lg-6">
+    <div className="row justify-content-center my-4 g-4">
+      <div className="col-12 col-lg-7">
         <div className="card shadow-sm border-0 rounded-4">
           <div className="card-body p-4">
             <h3 className="fw-bold mb-4">Add a book to your shelf</h3>
@@ -71,6 +80,18 @@ export default function AddBook() {
                 </div>
               </div>
               <div className="mb-3">
+                <label className="form-label">Cover image link (optional)</label>
+                <input
+                  name="coverUrl"
+                  type="url"
+                  className="form-control"
+                  placeholder="https://example.com/cover.jpg"
+                  value={form.coverUrl}
+                  onChange={handleChange}
+                />
+                <div className="form-text">Paste a direct link to an image. The preview updates as you type.</div>
+              </div>
+              <div className="mb-3">
                 <label className="form-label">Description</label>
                 <textarea name="description" rows={3} className="form-control" value={form.description} onChange={handleChange} />
               </div>
@@ -79,6 +100,13 @@ export default function AddBook() {
               </button>
             </form>
           </div>
+        </div>
+      </div>
+
+      <div className="col-12 col-lg-4">
+        <div className="position-sticky" style={{ top: 90 }}>
+          <p className="text-muted small mb-2">Preview</p>
+          <BookCover book={preview} height={300} className="rounded-4 shadow" />
         </div>
       </div>
     </div>

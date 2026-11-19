@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import BookCard from "../components/BookCard";
 import SearchBar from "../components/SearchBar";
-import { Loading, ErrorMsg } from "../components/Status";
+import { SkeletonGrid } from "../components/Skeleton";
+import { ErrorMsg } from "../components/Status";
 import { api } from "../api/client";
 
 export default function BrowseBooks() {
@@ -61,17 +62,20 @@ export default function BrowseBooks() {
       <ErrorMsg message={error} />
 
       {loading ? (
-        <Loading />
+        <SkeletonGrid count={8} />
       ) : (
         <>
           <p className="text-muted small">{books.length} book(s) found</p>
           {books.length === 0 ? (
-            <div className="text-center text-muted py-5">No books match your search.</div>
+            <div className="text-center text-muted py-5">
+              <div className="display-4">🔍</div>
+              No books match your search.
+            </div>
           ) : (
             <div className="row g-4">
-              {books.map((b) => (
+              {books.map((b, i) => (
                 <div className="col-12 col-sm-6 col-lg-3" key={b.id}>
-                  <BookCard book={b} />
+                  <BookCard book={b} index={i} />
                 </div>
               ))}
             </div>

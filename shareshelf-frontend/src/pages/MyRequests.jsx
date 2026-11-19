@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import StatusBadge from "../components/StatusBadge";
 import { Loading, ErrorMsg } from "../components/Status";
+import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
 import { shortDate } from "../utils/bookColor";
 
 export default function MyRequests() {
+  const { toast, confirm } = useUI();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,13 +19,21 @@ export default function MyRequests() {
       .finally(() => setLoading(false));
   }, []);
 
-  const cancel = async (id) => {
-    setError("");
+  const cancel = async (request) => {
+    const ok = await confirm({
+      title: "Cancel this request?",
+      message: `Your request for "${request.bookTitle}" will be cancelled.`,
+      confirmText: "Cancel request",
+      danger: true,
+    });
+    if (!ok) return;
+
     try {
-      const updated = await api(`/api/requests/${id}/cancel`, { method: "PUT" });
-      setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+      const updated = await api(`/api/requests/${request.id}/cancel`, { method: "PUT" });
+      setRequests((prev) => prev.map((r) => (r.id === request.id ? updated : r)));
+      toast("Request cancelled", "info");
     } catch (err) {
-      setError(err.message);
+      toast(err.message, "error");
     }
   };
 
@@ -36,12 +46,13 @@ export default function MyRequests() {
         <Loading />
       ) : requests.length === 0 ? (
         <div className="text-center text-muted py-5">
+          <div className="display-4">📤</div>
           You haven't requested any books yet. <Link to="/browse">Browse books</Link>.
         </div>
       ) : (
-        <div className="table-responsive bg-white rounded-3 shadow-sm">
+        <div className="table-responsive bg-body rounded-3 shadow-sm border">
           <table className="table align-middle mb-0">
-            <thead className="table-light">
+            <thead>
               <tr>
                 <th>Book</th>
                 <th>Owner</th>
@@ -61,7 +72,7 @@ export default function MyRequests() {
                   <td><StatusBadge status={r.status} /></td>
                   <td className="text-end">
                     {r.status === "PENDING" && (
-                      <button className="btn btn-sm btn-outline-danger" onClick={() => cancel(r.id)}>
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => cancel(r)}>
                         Cancel
                       </button>
                     )}
