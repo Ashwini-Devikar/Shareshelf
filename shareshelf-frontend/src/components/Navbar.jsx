@@ -2,10 +2,11 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useUI } from "../context/UIContext";
+import PlayerBar from "./PlayerBar";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const { theme, toggle } = useTheme();
+  const { theme, toggle, arcade, toggleArcade, sound, toggleSound } = useTheme();
   const { toast } = useUI();
   const navigate = useNavigate();
 
@@ -55,6 +56,7 @@ export default function Navbar() {
                   My Space
                 </a>
                 <ul className="dropdown-menu">
+                  <li><NavLink className="dropdown-item" to="/quests">🏆 Quest Log</NavLink></li>
                   <li><NavLink className="dropdown-item" to="/dashboard">📊 Dashboard</NavLink></li>
                   <li><NavLink className="dropdown-item" to="/my-shelf">📚 My Shelf</NavLink></li>
                   <li><NavLink className="dropdown-item" to="/wishlist">♥ Wishlist</NavLink></li>
@@ -66,7 +68,29 @@ export default function Navbar() {
             )}
           </ul>
 
-          <div className="d-flex gap-2 align-items-center">
+          <div className="d-flex gap-2 align-items-center flex-wrap">
+            {user && <PlayerBar />}
+
+            <button
+              type="button"
+              className={`theme-toggle ${arcade ? "on" : ""}`}
+              onClick={toggleArcade}
+              aria-pressed={arcade}
+              aria-label="Toggle arcade mode"
+              title={arcade ? "Arcade mode: on" : "Arcade mode: off"}
+            >
+              🎮
+            </button>
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleSound}
+              aria-pressed={sound}
+              aria-label="Toggle sound effects"
+              title={sound ? "Sound: on" : "Sound: off"}
+            >
+              {sound ? "🔊" : "🔇"}
+            </button>
             <button
               type="button"
               className="theme-toggle"
@@ -78,10 +102,7 @@ export default function Navbar() {
             </button>
 
             {user ? (
-              <>
-                <span className="text-muted small d-none d-md-inline">Hi, {user.name}</span>
-                <button className="btn btn-outline-brand" onClick={handleLogout}>Logout</button>
-              </>
+              <button className="btn btn-outline-brand" onClick={handleLogout}>Logout</button>
             ) : (
               <>
                 <Link to="/login" className="btn btn-outline-brand">Login</Link>

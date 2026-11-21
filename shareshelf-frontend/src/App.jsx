@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Wishlist from "./pages/Wishlist";
+import Quests from "./pages/Quests";
 import MyShelf from "./pages/MyShelf";
 import AddBook from "./pages/AddBook";
 import MyRequests from "./pages/MyRequests";
@@ -31,6 +32,7 @@ export default function App() {
 
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+            <Route path="/quests" element={<ProtectedRoute><Quests /></ProtectedRoute>} />
             <Route path="/my-shelf" element={<ProtectedRoute><MyShelf /></ProtectedRoute>} />
             <Route path="/add-book" element={<ProtectedRoute><AddBook /></ProtectedRoute>} />
             <Route path="/my-requests" element={<ProtectedRoute><MyRequests /></ProtectedRoute>} />

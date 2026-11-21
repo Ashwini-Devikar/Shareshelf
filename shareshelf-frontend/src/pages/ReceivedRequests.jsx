@@ -3,6 +3,7 @@ import StatusBadge from "../components/StatusBadge";
 import { Loading, ErrorMsg } from "../components/Status";
 import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
+import { useGame } from "../context/GameContext";
 import { shortDate } from "../utils/bookColor";
 
 const successText = {
@@ -13,6 +14,7 @@ const successText = {
 
 export default function ReceivedRequests() {
   const { toast, confirm } = useUI();
+  const { refresh } = useGame();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -40,6 +42,7 @@ export default function ReceivedRequests() {
       const updated = await api(`/api/requests/${request.id}/${action}`, { method: "PUT" });
       setRequests((prev) => prev.map((r) => (r.id === request.id ? updated : r)));
       toast(successText[action], action === "reject" ? "info" : "success");
+      refresh();
     } catch (err) {
       toast(err.message, "error");
     }

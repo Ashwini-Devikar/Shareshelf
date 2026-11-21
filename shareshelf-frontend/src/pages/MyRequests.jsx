@@ -4,10 +4,12 @@ import StatusBadge from "../components/StatusBadge";
 import { Loading, ErrorMsg } from "../components/Status";
 import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
+import { useGame } from "../context/GameContext";
 import { shortDate } from "../utils/bookColor";
 
 export default function MyRequests() {
   const { toast, confirm } = useUI();
+  const { refresh } = useGame();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -32,6 +34,7 @@ export default function MyRequests() {
       const updated = await api(`/api/requests/${request.id}/cancel`, { method: "PUT" });
       setRequests((prev) => prev.map((r) => (r.id === request.id ? updated : r)));
       toast("Request cancelled", "info");
+      refresh();
     } catch (err) {
       toast(err.message, "error");
     }

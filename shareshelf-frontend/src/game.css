@@ -1,0 +1,341 @@
+/* ===== Game layer: player bar, cards, quests, mascot, effects ===== */
+
+.fade-up {
+  animation-fill-mode: backwards;
+}
+
+/* ---------- Player bar ---------- */
+.player-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--bs-border-color);
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.player-bar:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ss-shadow-hover);
+  color: var(--bs-body-color);
+}
+.lvl-badge {
+  background: linear-gradient(135deg, #ffd43b, #ff922b);
+  color: #3b2a00;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: 8px;
+}
+.xp-track {
+  display: inline-block;
+  width: 72px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--bs-secondary-bg);
+  overflow: hidden;
+}
+.xp-track-lg {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  height: 14px;
+}
+.xp-fill {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #40c057, #ffd43b);
+  transition: width 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.theme-toggle.on {
+  background: var(--ss-soft);
+  border-color: var(--ss-brand);
+}
+
+/* ---------- Trading-card book cards ---------- */
+.book-card {
+  --rarity: #868e96;
+  --rx: 0deg;
+  --ry: 0deg;
+  border: 2px solid color-mix(in srgb, var(--rarity) 55%, transparent);
+  transform: perspective(800px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  will-change: transform;
+}
+.book-card:hover {
+  transform: perspective(800px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(-6px);
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--rarity) 40%, transparent);
+}
+.rarity-legendary { --rarity: #f5b301; }
+.rarity-rare { --rarity: #339af0; }
+.rarity-uncommon { --rarity: #40c057; }
+.rarity-common { --rarity: #868e96; }
+
+.rarity-tag {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.6rem;
+  background: var(--rarity);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.rarity-legendary .rarity-tag {
+  background: linear-gradient(135deg, #ffd43b, #ff922b);
+  color: #3b2a00;
+  text-shadow: none;
+}
+.card-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.32), transparent 55%);
+  transition: opacity 0.2s ease;
+}
+.book-card:hover .card-shine {
+  opacity: 1;
+}
+.rarity-legendary .card-shine {
+  background:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.4), transparent 55%),
+    linear-gradient(115deg, transparent 25%, rgba(255, 215, 0, 0.22) 42%, rgba(255, 105, 180, 0.2) 52%, rgba(0, 200, 255, 0.2) 62%, transparent 78%);
+}
+
+/* ---------- Quests and badges ---------- */
+.quest-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--bs-border-color-translucent);
+  border-radius: 1rem;
+  background: var(--bs-body-bg);
+  transition: transform 0.2s ease;
+}
+.quest-item:hover {
+  transform: translateY(-2px);
+}
+.quest-item.done {
+  border-color: #40c057;
+  opacity: 0.8;
+}
+.quest-icon {
+  font-size: 1.7rem;
+}
+.badge-card {
+  height: 100%;
+  text-align: center;
+  padding: 1rem 0.6rem;
+  border-radius: 1rem;
+  border: 2px solid var(--bs-border-color-translucent);
+  background: var(--bs-body-bg);
+  transition: transform 0.2s ease;
+}
+.badge-card:hover {
+  transform: translateY(-4px) rotate(-1deg);
+}
+.badge-card.locked {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+.badge-card.unlocked {
+  border-color: #ffd43b;
+  box-shadow: 0 0 18px rgba(255, 212, 59, 0.45);
+  animation: glowPulse 2.6s ease-in-out infinite;
+}
+.badge-icon {
+  font-size: 2.3rem;
+  line-height: 1.2;
+}
+
+/* ---------- Mascot and speech bubble ---------- */
+.mascot {
+  animation: bob 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.18));
+}
+.speech {
+  position: relative;
+  display: inline-block;
+  max-width: 270px;
+  padding: 0.6rem 0.95rem;
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border: 2px solid var(--ss-brand) !important;
+  border-radius: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.speech::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  width: 0;
+  height: 0;
+  margin-left: -8px;
+  border: 8px solid transparent;
+  border-top-color: var(--ss-brand);
+  border-bottom: 0;
+}
+
+/* ---------- Level-up and floating XP ---------- */
+.levelup-card {
+  animation: popIn 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+.levelup-title {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #ff4fa3, #ffd43b, #6bcbff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.levelup-level {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.float-text {
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 3100;
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #ffd43b;
+  text-shadow: 0 2px 0 #b8860b, 0 0 14px rgba(255, 212, 59, 0.85);
+  pointer-events: none;
+  animation: floatUp 1.3s ease-out forwards;
+}
+
+/* ===== Arcade style (the game look) ===== */
+[data-ss-style="arcade"] {
+  --ss-brand: #e0368a;
+  --ss-btn: #e0368a;
+  --ss-btn-hover: #c92b78;
+  --ss-soft: #ffe3f2;
+}
+[data-ss-style="arcade"][data-bs-theme="dark"] {
+  --ss-brand: #6ee7ff;
+  --ss-btn: #7c5cff;
+  --ss-btn-hover: #9378ff;
+  --ss-soft: #1b1840;
+}
+
+[data-ss-style="arcade"] body {
+  font-family: "Fredoka", "Segoe UI", system-ui, sans-serif;
+  background: linear-gradient(180deg, #fff0f8 0%, #e8f0ff 60%, #f3ecff 100%) fixed;
+}
+[data-ss-style="arcade"][data-bs-theme="dark"] body {
+  background: linear-gradient(180deg, #0d0a24 0%, #1a1246 55%, #2a1459 100%) fixed;
+}
+
+/* twinkling stars behind everything */
+[data-ss-style="arcade"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.6;
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, #ff9ccf, transparent),
+    radial-gradient(2px 2px at 120px 80px, #ffd43b, transparent),
+    radial-gradient(1.5px 1.5px at 200px 150px, #7aa7ff, transparent),
+    radial-gradient(2px 2px at 80px 200px, #ff9ccf, transparent),
+    radial-gradient(1.5px 1.5px at 260px 40px, #6bcbff, transparent);
+  background-size: 300px 260px;
+  animation: starDrift 70s linear infinite;
+}
+
+/* pixel-font headings (sizes lowered because the font is wide) */
+[data-ss-style="arcade"] h1,
+[data-ss-style="arcade"] h2,
+[data-ss-style="arcade"] h3,
+[data-ss-style="arcade"] .navbar-brand,
+[data-ss-style="arcade"] .stat-number,
+[data-ss-style="arcade"] .levelup-title {
+  font-family: "Press Start 2P", "Courier New", monospace;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+[data-ss-style="arcade"] .display-4 { font-size: clamp(1.3rem, 4vw, 2.2rem); }
+[data-ss-style="arcade"] h2 { font-size: clamp(1rem, 2.6vw, 1.4rem); }
+[data-ss-style="arcade"] h3 { font-size: 1.05rem; }
+[data-ss-style="arcade"] .navbar-brand { font-size: 0.85rem !important; }
+[data-ss-style="arcade"] .stat-number { font-size: 1.3rem; }
+[data-ss-style="arcade"] .levelup-title { font-size: 1.5rem; }
+
+/* chunky cards with an offset "pixel" shadow */
+[data-ss-style="arcade"] .stat-card,
+[data-ss-style="arcade"] .quest-item,
+[data-ss-style="arcade"] .badge-card,
+[data-ss-style="arcade"] .hero {
+  border: 3px solid var(--ss-brand);
+  box-shadow: 5px 5px 0 var(--ss-brand);
+}
+[data-ss-style="arcade"] .book-card {
+  border-width: 3px;
+  box-shadow: 5px 5px 0 var(--rarity);
+}
+[data-ss-style="arcade"] .book-card:hover {
+  box-shadow: 8px 8px 0 var(--rarity);
+}
+[data-ss-style="arcade"] .badge-card.unlocked {
+  box-shadow: 5px 5px 0 #ffd43b;
+  animation: none;
+}
+
+/* game-style buttons that press down when clicked */
+[data-ss-style="arcade"] .btn {
+  border-radius: 14px;
+  font-weight: 600;
+}
+[data-ss-style="arcade"] .btn-brand,
+[data-ss-style="arcade"] .btn-success,
+[data-ss-style="arcade"] .btn-danger {
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.28);
+}
+[data-ss-style="arcade"] .btn-brand:hover {
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.28);
+}
+[data-ss-style="arcade"] .btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+}
+
+[data-ss-style="arcade"] .player-bar {
+  border: 2px solid var(--ss-brand);
+}
+[data-ss-style="arcade"] .lvl-badge {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6rem;
+}
+
+/* ===== Extra animations ===== */
+@keyframes bob {
+  50% { transform: translateY(-8px); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.6) rotate(-4deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes floatUp {
+  from { opacity: 1; transform: translate(-50%, 0) scale(0.8); }
+  to { opacity: 0; transform: translate(-50%, -80px) scale(1.25); }
+}
+@keyframes glowPulse {
+  50% { box-shadow: 0 0 26px rgba(255, 212, 59, 0.75); }
+}
+@keyframes starDrift {
+  to { background-position: 300px 260px; }
+}

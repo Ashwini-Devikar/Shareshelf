@@ -2,11 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useUI } from "../context/UIContext";
+import { useGame } from "../context/GameContext";
 
 export default function WishlistButton({ bookId }) {
   const { user } = useAuth();
   const { has, toggle } = useWishlist();
   const { toast } = useUI();
+  const { track } = useGame();
   const navigate = useNavigate();
   const saved = has(bookId);
 
@@ -20,6 +22,7 @@ export default function WishlistButton({ bookId }) {
       return;
     }
     const added = toggle(bookId);
+    if (added) track("wish");
     toast(added ? "Saved to your wishlist" : "Removed from your wishlist", added ? "success" : "info");
   };
 

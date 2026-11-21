@@ -4,11 +4,18 @@ import SearchBar from "../components/SearchBar";
 import { SkeletonGrid } from "../components/Skeleton";
 import { ErrorMsg } from "../components/Status";
 import { api } from "../api/client";
+import { useGame } from "../context/GameContext";
 
 export default function BrowseBooks() {
   const [query, setQuery] = useState("");
   const [genre, setGenre] = useState("");
   const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const { track } = useGame();
+
+  // Daily quest: "Explore the shelves"
+  useEffect(() => {
+    track("browse");
+  }, [track]);
 
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);

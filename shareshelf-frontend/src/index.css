@@ -303,7 +303,7 @@ body {
 
 /* ---------- Animations ---------- */
 .fade-up {
-  animation: fadeUp 0.45s ease both;
+  animation: fadeUp 0.45s ease backwards;
 }
 
 @keyframes fadeUp {

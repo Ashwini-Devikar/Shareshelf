@@ -5,12 +5,14 @@ import { ErrorMsg } from "../components/Status";
 import BookCover from "../components/BookCover";
 import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
+import { useGame } from "../context/GameContext";
 
 const conditions = ["NEW", "GOOD", "FAIR", "WORN"];
 
 export default function AddBook() {
   const navigate = useNavigate();
   const { toast } = useUI();
+  const { track } = useGame();
   const [form, setForm] = useState({
     title: "",
     author: "",
@@ -34,6 +36,7 @@ export default function AddBook() {
     setSaving(true);
     try {
       await api("/api/books", { method: "POST", body: { ...form, coverUrl: form.coverUrl.trim() || null } });
+      track("share");
       toast(`"${form.title.trim()}" added to your shelf`);
       navigate("/my-shelf");
     } catch (err) {

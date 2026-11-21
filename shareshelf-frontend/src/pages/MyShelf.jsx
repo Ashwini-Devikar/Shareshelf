@@ -5,9 +5,11 @@ import { SkeletonGrid } from "../components/Skeleton";
 import { ErrorMsg } from "../components/Status";
 import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
+import { useGame } from "../context/GameContext";
 
 export default function MyShelf() {
   const { toast, confirm } = useUI();
+  const { refresh } = useGame();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -32,6 +34,7 @@ export default function MyShelf() {
       await api(`/api/books/${book.id}`, { method: "DELETE" });
       setBooks((prev) => prev.filter((b) => b.id !== book.id));
       toast("Book removed from your shelf");
+      refresh();
     } catch (err) {
       toast(err.message, "error");
     }

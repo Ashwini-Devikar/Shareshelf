@@ -7,11 +7,13 @@ import { Loading, ErrorMsg } from "../components/Status";
 import { useAuth } from "../context/AuthContext";
 import { useUI } from "../context/UIContext";
 import { api } from "../api/client";
+import { useGame } from "../context/GameContext";
 
 export default function BookDetails() {
   const { id } = useParams();
   const { user } = useAuth();
   const { toast } = useUI();
+  const { track, refresh } = useGame();
   const navigate = useNavigate();
 
   const [book, setBook] = useState(null);
@@ -58,6 +60,8 @@ export default function BookDetails() {
       setSent(true);
       setBook({ ...book, status: "REQUESTED" });
       toast("Request sent to the owner!");
+      track("request");
+      refresh();
     } catch (err) {
       setSendError(err.message);
       toast(err.message, "error");
