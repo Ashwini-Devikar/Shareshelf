@@ -43,6 +43,11 @@ export default function Navbar() {
             <li className="nav-item">
               <NavLink className="nav-link" to="/browse">Browse Books</NavLink>
             </li>
+            {user && user.role === "ADMIN" && (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/admin">🛡️ Admin</NavLink>
+              </li>
+            )}
             {user && (
               <li className="nav-item dropdown">
                 <a

@@ -11,6 +11,8 @@ import Wishlist from "./pages/Wishlist";
 import Quests from "./pages/Quests";
 import MyShelf from "./pages/MyShelf";
 import AddBook from "./pages/AddBook";
+import EditBook from "./pages/EditBook";
+import AdminPanel from "./pages/AdminPanel";
 import MyRequests from "./pages/MyRequests";
 import ReceivedRequests from "./pages/ReceivedRequests";
 
@@ -35,6 +37,8 @@ export default function App() {
             <Route path="/quests" element={<ProtectedRoute><Quests /></ProtectedRoute>} />
             <Route path="/my-shelf" element={<ProtectedRoute><MyShelf /></ProtectedRoute>} />
             <Route path="/add-book" element={<ProtectedRoute><AddBook /></ProtectedRoute>} />
+            <Route path="/edit-book/:id" element={<ProtectedRoute><EditBook /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute adminOnly><AdminPanel /></ProtectedRoute>} />
             <Route path="/my-requests" element={<ProtectedRoute><MyRequests /></ProtectedRoute>} />
             <Route path="/received-requests" element={<ProtectedRoute><ReceivedRequests /></ProtectedRoute>} />
 

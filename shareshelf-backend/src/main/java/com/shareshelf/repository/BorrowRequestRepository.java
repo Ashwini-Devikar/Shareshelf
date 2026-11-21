@@ -11,4 +11,11 @@ public interface BorrowRequestRepository extends JpaRepository<BorrowRequest, Lo
 
     // Requests other people sent for my books
     List<BorrowRequest> findByBookOwnerIdOrderByRequestedAtDesc(Long ownerId);
+
+    // Used when an admin deletes a user (clean up related rows first)
+    List<BorrowRequest> findByBorrowerId(Long borrowerId);
+
+    void deleteByBookOwnerId(Long ownerId);
+
+    void deleteByBorrowerId(Long borrowerId);
 }

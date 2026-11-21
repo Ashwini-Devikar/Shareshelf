@@ -62,9 +62,14 @@ export default function MyShelf() {
             <div className="col-12 col-sm-6 col-lg-3" key={b.id}>
               <div className="d-flex flex-column h-100">
                 <BookCard book={b} index={i} />
-                <button className="btn btn-outline-danger btn-sm mt-2" onClick={() => handleDelete(b)}>
-                  Remove
-                </button>
+                <div className="d-flex gap-2 mt-2">
+                  <Link to={`/edit-book/${b.id}`} className="btn btn-outline-brand btn-sm flex-fill">
+                    Edit
+                  </Link>
+                  <button className="btn btn-outline-danger btn-sm flex-fill" onClick={() => handleDelete(b)}>
+                    Remove
+                  </button>
+                </div>
               </div>
             </div>
           ))}
